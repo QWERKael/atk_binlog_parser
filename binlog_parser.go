@@ -107,6 +107,4 @@ func main() {
 	close(writers)
 	wg.Wait()
 	fmt.Printf("\n-- 解析完成\n")
-	//connect.CloseConn()
-	//close(pus)
 }

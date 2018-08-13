@@ -64,7 +64,6 @@ func (trans *Trans) formatWriteEvent(event replication.Event) {
 	schemaName := tm.schemaName
 	tableName := tm.tableName
 	columnNames := tm.columnNames
-	//fmt.Fprintf(trans.strBuf, "%s\t%#v\n", "insert", tm)
 	row := rowsEvent.Rows[0]
 	if len(columnNames) != len(row) {
 		fmt.Fprintf(trans.strBuf, "-- `%s`.`%s`表中，列名数量与binlog中的列数量不符\n", schemaName, tableName)
@@ -77,23 +76,6 @@ func (trans *Trans) formatWriteEvent(event replication.Event) {
 		return
 	}
 	trans.effectedRows++
-	//var strValueNames = new(bytes.Buffer)
-	//var strValues = new(bytes.Buffer)
-	//for idx, colName := range columnNames {
-	//	if idx == 0 {
-	//		fmt.Fprintf(strValueNames, "`%s`", colName)
-	//	} else {
-	//		fmt.Fprintf(strValueNames, ", `%s`", colName)
-	//	}
-	//}
-	//for idx, colValue := range row {
-	//	if idx == 0 {
-	//		fmt.Fprintf(strValues, "`%s`", fmt.Sprint(colValue))
-	//	} else {
-	//		fmt.Fprintf(strValues, ", '%s'", fmt.Sprint(colValue))
-	//	}
-	//}
-	//stmt := fmt.Sprintf("INSERT INTO `%s`.`%s`(%s) VALUES (%s);", SchemaName, TableName, strValueNames, strValues)
 	if trans.flashback {
 		stmt := format.DeleteMaker(schemaName, tableName, row, columnNames)
 		fmt.Fprintf(trans.strBuf, "%s\n", stmt)
@@ -113,13 +95,11 @@ func (trans *Trans) formatUpdateEvent(event replication.Event) {
 	schemaName := tm.schemaName
 	tableName := tm.tableName
 	columnNames := tm.columnNames
-	//fmt.Fprintf(trans.strBuf, "%s\t%#v\n", "update", tm)
 	rowOld := rowsEvent.Rows[0]
 	rowNew := rowsEvent.Rows[1]
 	if len(columnNames) != len(rowOld) || len(columnNames) != len(rowNew) {
 		fmt.Fprintf(trans.strBuf, "-- `%s`.`%s`表中，列名数量与binlog中的列数量不符\n", schemaName, tableName)
 		return
-		//os.Exit(1)
 	}
 	//开启merge选项后，执行merge操作
 	if trans.mergeFlag {
@@ -127,23 +107,6 @@ func (trans *Trans) formatUpdateEvent(event replication.Event) {
 		return
 	}
 	trans.effectedRows++
-	//var setStmt = new(bytes.Buffer)
-	//var whereStmt = new(bytes.Buffer)
-	//for idx, colName := range columnNames {
-	//	if idx == 0 {
-	//		fmt.Fprintf(setStmt, "`%s` = '%s'", colName, fmt.Sprint(rowNew[idx]))
-	//	} else {
-	//		fmt.Fprintf(setStmt, ", `%s` = '%s'", colName, fmt.Sprint(rowNew[idx]))
-	//	}
-	//}
-	//for idx, colName := range columnNames {
-	//	if idx == 0 {
-	//		fmt.Fprintf(whereStmt, "`%s` = '%s'", colName, fmt.Sprint(rowOld[idx]))
-	//	} else {
-	//		fmt.Fprintf(whereStmt, " AND `%s` = '%s'", colName, fmt.Sprint(rowOld[idx]))
-	//	}
-	//}
-	//stmt := fmt.Sprintf("UPDATE `%s`.`%s` SET %s WHERE %s;", SchemaName, TableName, setStmt, whereStmt)
 	if trans.flashback {
 		stmt := format.UpdateMaker(schemaName, tableName, rowNew, rowOld, columnNames)
 		fmt.Fprintf(trans.strBuf, "%s\n", stmt)
@@ -163,12 +126,10 @@ func (trans *Trans) formatDeleteEvent(event replication.Event) {
 	schemaName := tm.schemaName
 	tableName := tm.tableName
 	columnNames := tm.columnNames
-	//fmt.Fprintf(trans.strBuf, "%s\t%#v\n", "delete", tm)
 	row := rowsEvent.Rows[0]
 	if len(columnNames) != len(row) {
 		fmt.Fprintf(trans.strBuf, "-- `%s`.`%s`表中，列名数量与binlog中的列数量不符\n", schemaName, tableName)
 		return
-		//os.Exit(1)
 	}
 	//开启merge选项后，执行merge操作
 	if trans.mergeFlag {
@@ -176,15 +137,6 @@ func (trans *Trans) formatDeleteEvent(event replication.Event) {
 		return
 	}
 	trans.effectedRows++
-	//var whereStmt = new(bytes.Buffer)
-	//for idx, colName := range columnNames {
-	//	if idx == 0 {
-	//		fmt.Fprintf(whereStmt, "`%s` = '%s'", colName, fmt.Sprint(row[idx]))
-	//	} else {
-	//		fmt.Fprintf(whereStmt, " AND `%s` = '%s'", colName, fmt.Sprint(row[idx]))
-	//	}
-	//}
-	//stmt := fmt.Sprintf("DELETE FROM `%s`.`%s` WHERE %s;", SchemaName, TableName, whereStmt)
 	if trans.flashback {
 		stmt := format.InsertMaker(schemaName, tableName, row, columnNames)
 		fmt.Fprintf(trans.strBuf, "%s\n", stmt)
@@ -193,9 +145,3 @@ func (trans *Trans) formatDeleteEvent(event replication.Event) {
 		fmt.Fprintf(trans.strBuf, "%s\n", stmt)
 	}
 }
-
-//func formatRowEvent(event replication.Event, trans *Trans) {
-//	rowsEvent := event.(*replication.RowsEvent)
-//	tableId := uint64(rowsEvent.TableID)
-//	fmt.Fprintf(trans.strBuf, "COMMIT;//事务结束，事务号 %d", xid)
-//}

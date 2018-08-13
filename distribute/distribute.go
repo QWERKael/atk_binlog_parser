@@ -25,7 +25,6 @@ func Distributor(pus chan<- *parse.ParseUnit, file io.ReaderAt, startPos uint32,
 	var eventType replication.EventType
 	for (endPos == 0 || startPos < endPos) && (endTime == 0 || eventTimestamp < endTime) && err == nil {
 		pu := new(parse.ParseUnit)
-		//pu := parse.NewParseUnit()
 		for i := 0; (i < maxEvents || eventType != replication.XID_EVENT) && (endPos == 0 || startPos < endPos) && (endTime == 0 || eventTimestamp < endTime) && err == nil; {
 			eventTimestamp, eventLength, nextPos, eventType, err = PreDistribute(file, startPos)
 			if ok := f(eventType); ok {
@@ -73,12 +72,6 @@ func PreDistribute(file io.ReaderAt, startPos uint32) (uint32, uint32, uint32, r
 		return 0, 0, 0, 0, err
 	}
 	eventLength := binary.LittleEndian.Uint32(b)
-	//打印信息
-	//fmt.Println("event长度：", eventLength)
-	//for _, bin := range b {
-	//	fmt.Printf("%02X ", bin)
-	//}
-	//fmt.Println()
 	nextPos := startPos + eventLength
 	return eventTimestamp, eventLength, nextPos, eventType, nil
 }
@@ -104,13 +97,5 @@ func GetPosFromTime(file io.ReaderAt, beginTime uint32, startPos uint32) uint32 
 		eventTimestamp, _, nextPos, _, err = PreDistribute(file, startPos)
 		startPos = nextPos
 	}
-	//if err != nil {
-	//	if err == io.EOF {
-	//		println("未能找到开始时间点")
-	//		os.Exit(1)
-	//	}
-	//	println("获取起始位置出错")
-	//	os.Exit(1)
-	//}
 	return nextPos
 }

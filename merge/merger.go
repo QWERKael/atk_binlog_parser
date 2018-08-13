@@ -184,8 +184,6 @@ func (tableMergeUnits *TableMergeUnits) Decode() string {
 				os.Exit(1)
 			}
 		}
-		//fmt.Printf("%#v\n", schemaTable)
-		//fmt.Printf("%#v\n", tableMergeUnit)
 	}
 	str := fmt.Sprint(mergeBuffer)
 	return str
