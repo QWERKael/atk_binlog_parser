@@ -3,7 +3,7 @@ package connect
 import (
 	_ "github.com/go-sql-driver/mysql"
 	"database/sql"
-	"binlog_parser/util"
+	"atk_binlog_parser/util"
 )
 
 var TableSchemaCache = make(map[string][]string)

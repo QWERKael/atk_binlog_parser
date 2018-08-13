@@ -68,7 +68,6 @@ func (trans *Trans) formatWriteEvent(event replication.Event) {
 	if len(columnNames) != len(row) {
 		fmt.Fprintf(trans.strBuf, "-- `%s`.`%s`表中，列名数量与binlog中的列数量不符\n", schemaName, tableName)
 		return
-		//os.Exit(1)
 	}
 	//开启merge选项后，执行merge操作
 	if trans.mergeFlag {
@@ -76,13 +75,14 @@ func (trans *Trans) formatWriteEvent(event replication.Event) {
 		return
 	}
 	trans.effectedRows++
+	//执行flashback
 	if trans.flashback {
 		stmt := format.DeleteMaker(schemaName, tableName, row, columnNames)
 		fmt.Fprintf(trans.strBuf, "%s\n", stmt)
-	} else {
-		stmt := format.InsertMaker(schemaName, tableName, row, columnNames)
-		fmt.Fprintf(trans.strBuf, "%s\n", stmt)
+		return
 	}
+	stmt := format.InsertMaker(schemaName, tableName, row, columnNames)
+	fmt.Fprintf(trans.strBuf, "%s\n", stmt)
 }
 
 func (trans *Trans) formatUpdateEvent(event replication.Event) {
@@ -107,13 +107,14 @@ func (trans *Trans) formatUpdateEvent(event replication.Event) {
 		return
 	}
 	trans.effectedRows++
+	//执行flashback
 	if trans.flashback {
 		stmt := format.UpdateMaker(schemaName, tableName, rowNew, rowOld, columnNames)
 		fmt.Fprintf(trans.strBuf, "%s\n", stmt)
-	} else {
-		stmt := format.UpdateMaker(schemaName, tableName, rowOld, rowNew, columnNames)
-		fmt.Fprintf(trans.strBuf, "%s\n", stmt)
+		return
 	}
+	stmt := format.UpdateMaker(schemaName, tableName, rowOld, rowNew, columnNames)
+	fmt.Fprintf(trans.strBuf, "%s\n", stmt)
 }
 
 func (trans *Trans) formatDeleteEvent(event replication.Event) {
@@ -137,11 +138,12 @@ func (trans *Trans) formatDeleteEvent(event replication.Event) {
 		return
 	}
 	trans.effectedRows++
+	//执行flashback
 	if trans.flashback {
 		stmt := format.InsertMaker(schemaName, tableName, row, columnNames)
 		fmt.Fprintf(trans.strBuf, "%s\n", stmt)
-	} else {
-		stmt := format.DeleteMaker(schemaName, tableName, row, columnNames)
-		fmt.Fprintf(trans.strBuf, "%s\n", stmt)
+		return
 	}
+	stmt := format.DeleteMaker(schemaName, tableName, row, columnNames)
+	fmt.Fprintf(trans.strBuf, "%s\n", stmt)
 }

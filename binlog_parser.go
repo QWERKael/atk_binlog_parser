@@ -42,7 +42,7 @@ func main() {
 		panic(err.Error())
 	}
 	connect.GetAllTableSchema()
-	//解析单元的通道，缓冲为maxParallel，当正在解析的解析单元大于此数量时会阻塞，也可以将所有的分割都缓存起来使其不阻塞，
+	//解析单元的通道，缓冲为MaxGoroutine，当正在解析的解析单元大于此数量时会阻塞，也可以将所有的分割都缓存起来使其不阻塞，
 	//但是会占用大量的内存，而对性能的提升并不大
 	pus := make(chan *parse.ParseUnit, config.MaxGoroutine)
 	//检查文件

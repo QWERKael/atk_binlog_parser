@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"strings"
 	"atk_binlog_parser/merge"
+	"time"
 )
 
 type SchemaTable struct {
@@ -77,6 +78,7 @@ func (trans *Trans) decode(idx int, header replication.EventHeader, event replic
 	if trans.transDone == true {
 		trans.strBuf = bytes.NewBufferString(fmt.Sprintf("\n-- goroutine num %d\n", idx))
 	}
+	fmt.Fprintf(trans.strBuf, "-- time: %s, pos: %d, next-pos:%d\n", time.Unix(int64(header.Timestamp), 0).Format("2006-01-02 15:04:05"), header.LogPos-header.EventSize, header.LogPos)
 	switch header.EventType {
 	case replication.QUERY_EVENT:
 		trans.formatQuery(event)
