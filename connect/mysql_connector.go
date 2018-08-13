@@ -6,16 +6,8 @@ import (
 	"binlog_parser/util"
 )
 
-//var DB *sql.DB
 var TableSchemaCache = make(map[string][]string)
 
-//func init() {
-//	config := util.GetConfig()
-//	dsn := config.DSN
-//	GetConn(dsn)
-//	//GetAllTableSchema()
-//	//CloseConn()
-//}
 
 func GetConn(DSN string) (*sql.DB, error) {
 	db, err := sql.Open("mysql", DSN)
@@ -25,10 +17,6 @@ func GetConn(DSN string) (*sql.DB, error) {
 	//DB = db
 	return db, nil
 }
-
-//func CloseConn() {
-//	defer DB.Close()
-//}
 
 func GetMySQLTableMap(schemaName string, tableName string) []string {
 	fullName := schemaName + "." + tableName
